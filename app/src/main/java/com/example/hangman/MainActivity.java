@@ -8,12 +8,17 @@ import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import com.opencsv.CSVReader;
+
+import java.io.FileReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     public Map<String, Integer> imageMap = new HashMap<>();
@@ -26,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     TextView guessedLettersDisplay;
     TextView goalStringDisplay;
     GoalString goalString;
+    int points = 0;
+    List<String[]> goalStringList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,42 +45,61 @@ public class MainActivity extends AppCompatActivity {
         goalStringDisplay = findViewById(R.id.goalStringDisplay);
 
 
-        for (int i = 1; i <= 11; i++) {
+        for (int i = 1; i <= guessesAllowed; i++) {
             String imageName = String.format("stage%d", i);
             int imageId = getResources().getIdentifier(imageName, "drawable", getApplicationInfo().packageName);
             imageMap.put(imageName, imageId);
         }
 
-
-        //TODO HARDCODED, EDIT
-        goalString = new GoalString("check if the space hasn't");
+        //Hardcoded list selection for now todo list selector
+        String chosenList = "hard";
+        int listId = getResources().getIdentifier("raw/" + chosenList, null, getApplicationInfo().packageName);
+        InputStream inputStream = getResources().openRawResource(listId);
+        CSVFile csvFile = new CSVFile(inputStream);
+        goalStringList = csvFile.read();
+        //Randomly selects goalString from within the loaded list
+        int random = new Random().nextInt(goalStringList.size());
+        goalString = new GoalString(goalStringList.get(random)[0]);
         goalStringDisplay.setText(goalString.getClosedString());
 
     }
 
+
     public void onClickStep(View view) {
         String selectedLetter = pickerLetters[letterPicker.getValue()];
         boolean guessMatch = checkGuess(selectedLetter, goalString);
-        if (!guessMatch) {
+        if (guessMatch && goalString.getClosedString().equalsIgnoreCase(goalString.getOpenString())) {
+            winRound();
+        } else if (!guessMatch) {
             stage++;
             if (stage <= guessesAllowed) {
-                //todo if no guesses left, game over
-                //todo if correct, point
-                //todo add guessed letter to guessedLetters
-
-                for (int i = 0; i < guessedLetters.length; i++) {
-                    if (guessedLetters[i] == null) {
-                        guessedLetters[i] = selectedLetter;
-                        break;
-                    }
-                }
-
                 mainImage.setImageResource(imageMap.get("stage" + stage));
-                updateGuessedDisplay(guessedLetters);
-            }
 
-            updatePicker(guessedLetters);
+            } else {
+                gameOver();
+                return;
+            }
         }
+        for (int i = 0; i < guessedLetters.length; i++) {
+            if (guessedLetters[i] == null) {
+                guessedLetters[i] = selectedLetter;
+                break;
+            }
+        }
+        updateGuessedDisplay(guessedLetters);
+        updatePicker(guessedLetters);
+    }
+
+    private void winRound() {
+        points++;
+        mainImage.setImageResource(R.drawable.win);
+    }
+
+    private void gameOver() {
+        goalStringDisplay.setText(goalString.getOpenString());
+        mainImage.setImageResource(R.drawable.gameover);
+        //todo change step button to restart
+        //todo hide scroller
     }
 
     public void updatePicker(String[] guessedLetters) {
@@ -105,11 +131,8 @@ public class MainActivity extends AppCompatActivity {
         String display = "";
         for (String letter : guessedLetters) {
             if (letter != null) {
-                display = display + letter + ", ";
+                display = display + letter + "\n";
             }
-        }
-        if (display.length() != 0) {
-            display = display.substring(0, display.length() - 2);
         }
         guessedLettersDisplay.setText(display);
     }
