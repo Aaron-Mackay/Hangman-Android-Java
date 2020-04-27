@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -26,10 +27,12 @@ public class MainActivity extends AppCompatActivity {
     int stage = 1;
     final int guessesAllowed = 11;
     NumberPicker letterPicker;
-    String[] pickerLetters = new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
-    String[] guessedLetters = new String[26];
+    String[] pickerLetters;
+    String[] guessedLetters;
     TextView guessedLettersDisplay;
     TextView goalStringDisplay;
+    Button guessButton;
+    Button restartButton;
     GoalString goalString;
     int points = 0;
     List<String[]> goalStringList;
@@ -40,12 +43,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mainImage = findViewById(R.id.mainImage);
         guessedLettersDisplay = findViewById(R.id.guessedLetters);
-        updateGuessedDisplay(guessedLetters);
-        updatePicker(guessedLetters);
         goalStringDisplay = findViewById(R.id.goalStringDisplay);
-
-
-        for (int i = 1; i <= guessesAllowed; i++) {
+        guessButton = findViewById(R.id.guessButton);
+        restartButton = findViewById(R.id.restartButton);
+        for (int i = 1; i <= 11; i++) {
             String imageName = String.format("stage%d", i);
             int imageId = getResources().getIdentifier(imageName, "drawable", getApplicationInfo().packageName);
             imageMap.put(imageName, imageId);
@@ -53,15 +54,36 @@ public class MainActivity extends AppCompatActivity {
 
         //Hardcoded list selection for now todo list selector
         String chosenList = "hard";
-        int listId = getResources().getIdentifier("raw/" + chosenList, null, getApplicationInfo().packageName);
-        InputStream inputStream = getResources().openRawResource(listId);
-        CSVFile csvFile = new CSVFile(inputStream);
-        goalStringList = csvFile.read();
+        goalStringList = loadList(chosenList);
+        initialiseGame(goalStringList);
+    }
+
+    public void initialiseGame(List goalStringList) {
+        mainImage.setImageResource(imageMap.get("stage1"));
+        stage = 1;
+        guessButton.setVisibility(View.VISIBLE);
+        restartButton.setVisibility(View.GONE);
+        goalString = selectFromList(goalStringList);
+        pickerLetters = new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+        guessedLetters = new String[26];
+        updateGuessedDisplay(guessedLetters);
+        updatePicker(guessedLetters);
+    }
+
+    private GoalString selectFromList(List<String[]> goalStringList) {
         //Randomly selects goalString from within the loaded list
         int random = new Random().nextInt(goalStringList.size());
         goalString = new GoalString(goalStringList.get(random)[0]);
         goalStringDisplay.setText(goalString.getClosedString());
+        goalStringList.remove(random); //remove from session list so the word is not replayed
+        return goalString;
+    }
 
+    private List<String[]> loadList(String chosenList) {
+        int listId = getResources().getIdentifier("raw/" + chosenList, null, getApplicationInfo().packageName);
+        InputStream inputStream = getResources().openRawResource(listId);
+        CSVFile csvFile = new CSVFile(inputStream);
+        return csvFile.read();
     }
 
 
@@ -93,11 +115,17 @@ public class MainActivity extends AppCompatActivity {
     private void winRound() {
         points++;
         mainImage.setImageResource(R.drawable.win);
+        guessButton.setVisibility(View.INVISIBLE);
+        restartButton.setText("Continue");
+        restartButton.setVisibility(View.VISIBLE);
     }
 
     private void gameOver() {
         goalStringDisplay.setText(goalString.getOpenString());
         mainImage.setImageResource(R.drawable.gameover);
+        guessButton.setVisibility(View.INVISIBLE);
+        restartButton.setText("Restart");
+        restartButton.setVisibility(View.VISIBLE);
         //todo change step button to restart
         //todo hide scroller
     }
@@ -122,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         letterPicker = findViewById(R.id.letterWheel);
+        letterPicker.setDisplayedValues(null);
         letterPicker.setMinValue(0);
         letterPicker.setMaxValue(pickerLetters.length - 1);
         letterPicker.setDisplayedValues(pickerLetters);
@@ -155,5 +184,9 @@ public class MainActivity extends AppCompatActivity {
         goalString.setClosedString(goalStringCurrent); //updates with revealed string
         goalStringDisplay.setText(goalStringCurrent);
         return match;
+    }
+
+    public void restartGame(View view) {
+        initialiseGame(goalStringList);
     }
 }
