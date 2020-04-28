@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity {
     public Map<String, Integer> imageMap = new HashMap<>();
     ImageView mainImage;
     int stage = 1;
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Hardcoded list selection for now todo list selector
-        String chosenList = "hard";
+        String chosenList = getIntent().getStringExtra("listName");
         goalStringList = loadList(chosenList);
         initialiseGame(goalStringList);
     }
@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
 
     private GoalString selectFromList(List<String[]> goalStringList) {
         //Randomly selects goalString from within the loaded list
+        if (goalStringList.isEmpty()) {
+            //todo toast message, prompt for another list?
+        }
         int random = new Random().nextInt(goalStringList.size());
         goalString = new GoalString(goalStringList.get(random)[0]);
         goalStringDisplay.setText(goalString.getClosedString());
@@ -174,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
         String goalStringCurrent = "";
 
         for (int i = 0; i < goalStringOpen.length(); i++) {
-            if (goalStringOpen.charAt(i) == guessChar) {
+            if (Character.toLowerCase(goalStringOpen.charAt(i)) == guessChar) {
                 match = true;
-                goalStringCurrent = goalStringCurrent + guessChar;
+                goalStringCurrent = goalStringCurrent + goalStringOpen.charAt(i);
             } else {
                 goalStringCurrent = goalStringCurrent + goalStringClosed.charAt(i);
             }
