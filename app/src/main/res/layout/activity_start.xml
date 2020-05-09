@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".StartActivity">
 
     <ImageView
@@ -50,6 +51,7 @@
         android:id="@+id/mainImage"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
         android:adjustViewBounds="true"
         app:layout_constraintBottom_toTopOf="@id/scoreboardButton"
         app:layout_constraintEnd_toEndOf="parent"
