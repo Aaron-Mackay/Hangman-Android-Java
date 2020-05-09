@@ -9,7 +9,10 @@
     <ImageView
         android:id="@+id/gameTitle"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,11 +22,12 @@
 
     <Button
         android:id="@+id/playButton"
-        android:layout_width="135dp"
+        android:layout_width="wrap_content"
         android:layout_height="83dp"
-        android:layout_marginTop="37dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onClickPlay"
         android:text="Play"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,11 +35,12 @@
 
     <Button
         android:id="@+id/scoreboardButton"
-        android:layout_width="135dp"
+        android:layout_width="wrap_content"
         android:layout_height="83dp"
-        android:layout_marginTop="37dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onClickInstructions"
         android:text="Instructions"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,12 +48,13 @@
 
     <ImageView
         android:id="@+id/mainImage"
-        android:layout_width="239dp"
-        android:layout_height="309dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintBottom_toTopOf="@id/scoreboardButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gameTitle"
-        app:layout_constraintVertical_bias="0.050000012"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/stage10" />
 </androidx.constraintlayout.widget.ConstraintLayout>
