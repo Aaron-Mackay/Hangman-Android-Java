@@ -1,6 +1,6 @@
 # Hangman Android App
 
-On the android end, a hangman clone which randomly selected strings from lists to challenge the player with.
+On the android end, a hangman clone which randomly selected strings from lists to challenge the player with. A companion website for additional functionality can be found at www.playhangman.co.uk, and in a [repo](https://github.com/Aaron-Mackay/Hangman-Web-Flask).
 
 ## Goals
 * **Hangman app** - Supplies a string from an internal list
