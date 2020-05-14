@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hangman.ListRVAdapter;
 import com.example.hangman.R;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +48,11 @@ public class LocalFragment extends Fragment {
 
     public List<String> listRaw() {
         List<String> temp = new ArrayList<>();
-        Field[] fields = R.raw.class.getFields();
-        for (int count = 0; count < fields.length; count++) {
-            temp.add(fields[count].getName());
-            Log.i("Raw Asset: ", fields[count].getName());
+        File directory = getActivity().getFilesDir();
+        File[] files = directory.listFiles();
+        for (int count = 0; count < files.length; count++) {
+            temp.add(files[count].getName().replace(".csv", ""));
+            Log.i("Downloaded list: ", files[count].getName());
         }
         return temp;
     }

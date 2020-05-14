@@ -15,6 +15,6 @@ import com.example.hangman.R;
 public class OnlineFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_local, viewGroup, false);
+        return inflater.inflate(R.layout.fragment_online, viewGroup, false);
     }
 }

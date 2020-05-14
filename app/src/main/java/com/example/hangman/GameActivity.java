@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import com.opencsv.CSVReader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -83,8 +86,13 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private List<String[]> loadList(String chosenList) {
-        int listId = getResources().getIdentifier("raw/" + chosenList, null, getApplicationInfo().packageName);
-        InputStream inputStream = getResources().openRawResource(listId);
+        File file = new File(getFilesDir() + String.format("/%s.csv", chosenList));
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         CSVFile csvFile = new CSVFile(inputStream);
         return csvFile.read();
     }
