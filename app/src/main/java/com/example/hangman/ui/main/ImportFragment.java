@@ -64,14 +64,14 @@ public class ImportFragment extends Fragment implements View.OnClickListener {
     public void apiFetch(String listName) {
         try {
             //todo build function for testing on home wifi
-            String APIURL = "http://192.168.1.175:2500/api/%s.csv";
+            String APIURL = "http://185.108.171.164:2500/api/%s.json";
             URL url = new URL(String.format(APIURL, listName.toLowerCase()));
 
             InputStream inputStream = url.openStream();
-            Path check = Paths.get(String.valueOf(getActivity().getFilesDir()) + String.format("/%s.csv", listName));
+            Path check = Paths.get(String.valueOf(getActivity().getFilesDir()) + String.format("/%s.json", listName));
             Log.d("inthread", String.valueOf(check));
             Files.copy(inputStream, check, StandardCopyOption.REPLACE_EXISTING);
-
+            //todo add toast message for success/fail
         } catch (Exception e) {
             e.printStackTrace();
         }

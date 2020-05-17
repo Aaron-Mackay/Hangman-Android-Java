@@ -20,12 +20,19 @@ import com.example.hangman.ListRVAdapter;
 import com.example.hangman.R;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LocalFragment extends Fragment {
     List<String> filenames = new ArrayList<>();
+    ListRVAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -36,7 +43,7 @@ public class LocalFragment extends Fragment {
         RecyclerView recyclerViewLocal = RootView.findViewById(R.id.recyclerViewId);
 
         // Create adapter passing in the sample user data
-        ListRVAdapter adapter = new ListRVAdapter(filenames, getActivity());
+        adapter = new ListRVAdapter(filenames, getActivity());
         // Attach the adapter to the recyclerview to populate items
         recyclerViewLocal.setAdapter(adapter);
         // Set layout manager to position the items
@@ -51,9 +58,31 @@ public class LocalFragment extends Fragment {
         File directory = getActivity().getFilesDir();
         File[] files = directory.listFiles();
         for (int count = 0; count < files.length; count++) {
-            temp.add(files[count].getName().replace(".csv", ""));
+            temp.add(files[count].getName().replace(".json", ""));
             Log.i("Downloaded list: ", files[count].getName());
         }
+        if (temp.isEmpty()) {
+            int listId = getResources().getIdentifier("raw/" + "defaultlist", null, getActivity().getPackageName());
+            InputStream inputStream = getResources().openRawResource(listId);
+
+            Path check = Paths.get(String.valueOf(getActivity().getFilesDir()) + String.format("/%s.json", "defaultlist"));
+            Log.d("inthread", String.valueOf(check));
+            try {
+                Files.copy(inputStream, check, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return temp;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        filenames.clear();
+        List<String> newList;
+        newList = listRaw();
+        filenames.addAll(newList);
+        adapter.notifyDataSetChanged();
     }
 }

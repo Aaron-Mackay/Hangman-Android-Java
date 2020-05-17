@@ -3,12 +3,14 @@ package com.example.hangman;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.opencsv.CSVReader;
 
 import java.io.File;
@@ -38,7 +40,7 @@ public class GameActivity extends AppCompatActivity {
     Button restartButton;
     GoalString goalString;
     int points = 0;
-    List<String[]> goalStringList;
+    ListObject goalStringList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,40 +63,44 @@ public class GameActivity extends AppCompatActivity {
         initialiseGame(goalStringList);
     }
 
-    public void initialiseGame(List goalStringList) {
-        mainImage.setImageResource(imageMap.get("stage1"));
+    public void initialiseGame(ListObject goalStringList) {
+        // Set initial stage of game
         stage = 1;
+        mainImage.setImageResource(imageMap.get(String.format("stage%d", stage)));
+
         guessButton.setVisibility(View.VISIBLE);
         restartButton.setVisibility(View.GONE);
-        goalString = selectFromList(goalStringList);
+        ArrayList<String> gameStrings = new ArrayList<>(Arrays.asList(goalStringList.list));
+        goalString = selectFromList(gameStrings);
         pickerLetters = new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
         guessedLetters = new String[26];
         updateGuessedDisplay(guessedLetters);
         updatePicker(guessedLetters);
     }
 
-    private GoalString selectFromList(List<String[]> goalStringList) {
+    private GoalString selectFromList(ArrayList<String> gameStrings) {
         //Randomly selects goalString from within the loaded list
-        if (goalStringList.isEmpty()) {
+        if (gameStrings.isEmpty()) {
             //todo toast message, prompt for another list?
         }
-        int random = new Random().nextInt(goalStringList.size());
-        goalString = new GoalString(goalStringList.get(random)[0]);
+        int random = new Random().nextInt(gameStrings.size());
+        goalString = new GoalString(gameStrings.get(random));
         goalStringDisplay.setText(goalString.getClosedString());
-        goalStringList.remove(random); //remove from session list so the word is not replayed
+        gameStrings.remove(random); //remove from session list so the word is not replayed
         return goalString;
     }
 
-    private List<String[]> loadList(String chosenList) {
-        File file = new File(getFilesDir() + String.format("/%s.csv", chosenList));
-        InputStream inputStream = null;
+    private ListObject loadList(String chosenList) {
+        ListObject object = null;
+        Gson gson = new Gson();
         try {
-            inputStream = new FileInputStream(file);
+            Log.d("openjson", String.format("%s/%s.json", getFilesDir(), chosenList));
+            object = gson.fromJson(new FileReader(String.format("%s/%s.json", getFilesDir(), chosenList)), ListObject.class);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        CSVFile csvFile = new CSVFile(inputStream);
-        return csvFile.read();
+
+        return object;
     }
 
 
@@ -174,7 +180,11 @@ public class GameActivity extends AppCompatActivity {
                 display = display + letter + "\n";
             }
         }
-        guessedLettersDisplay.setText(display);
+        if (display.equals("")) {
+            guessedLettersDisplay.setText(" ");
+        } else {
+            guessedLettersDisplay.setText(display);
+        }
     }
 
     public boolean checkGuess(String guess, GoalString goalString) {

@@ -41,7 +41,7 @@ public class ListRVAdapter extends RecyclerView.Adapter<ListRVAdapter.ViewHolder
     private List<String> mGoalStringNameList;
     private Context mContext;
 
-    // Pass in the contact array into the constructor
+    // Pass in the list array into the constructor
     public ListRVAdapter(List<String> goalStringNameList, Context context) {
         mGoalStringNameList = goalStringNameList;
         mContext = context;
@@ -66,7 +66,7 @@ public class ListRVAdapter extends RecyclerView.Adapter<ListRVAdapter.ViewHolder
 
     // Involves populating data into the item through holder
     @Override
-    public void onBindViewHolder(ListRVAdapter.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(ListRVAdapter.ViewHolder viewHolder, final int position) {
         // Get the data model based on position
         goalStringListName = mGoalStringNameList.get(position);
 
@@ -77,6 +77,25 @@ public class ListRVAdapter extends RecyclerView.Adapter<ListRVAdapter.ViewHolder
 
         //Set properties of those views
         textView.setText(goalStringListName);
+
+        //Creates onclicklistener for each list row, taking the list name as an intent extra and passing it to the gameactivity
+        View.OnClickListener playListOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String selectedList = mGoalStringNameList.get(position);
+                Intent myIntent = new Intent(mContext, GameActivity.class);
+                myIntent.putExtra("listName", selectedList);
+                mContext.startActivity(myIntent);
+            }
+        };
+
+        View.OnClickListener scoreboardOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo intent to scoreboard page
+            }
+        };
+
         playButton.setOnClickListener(playListOnClickListener);
         scoreboardButton.setOnClickListener(scoreboardOnClickListener);
     }
@@ -87,21 +106,5 @@ public class ListRVAdapter extends RecyclerView.Adapter<ListRVAdapter.ViewHolder
         return mGoalStringNameList.size();
     }
 
-    //Creates onclicklistener for each list row, taking the list name as an intent extra and passing it to the gameactivity
-    View.OnClickListener playListOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String selectedList = goalStringListName;
-            Intent myIntent = new Intent(mContext, GameActivity.class);
-            myIntent.putExtra("listName", selectedList);
-            mContext.startActivity(myIntent);
-        }
-    };
 
-    View.OnClickListener scoreboardOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            //todo intent to scoreboard page
-        }
-    };
 }
