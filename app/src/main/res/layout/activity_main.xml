@@ -57,21 +57,35 @@
 
     <TextView
         android:id="@+id/guessedLetters"
-        android:layout_width="17dp"
+        android:layout_width="35dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="4dp"
         android:gravity="center_horizontal|top"
-        android:text="g"
+        android:text="a\nb\nc\nd\ne\nf\ng\nh\n"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/mainImage"
         app:layout_constraintTop_toTopOf="@+id/mainImage" />
 
     <TextView
-        android:id="@+id/goalStringDisplay"
+        android:id="@+id/currentScoreView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal|top"
+        android:text="0"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="@id/divider"
+        app:layout_constraintTop_toTopOf="@+id/mainImage" />
+
+    <TextView
+        android:id="@+id/goalStringDisplay"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:letterSpacing="0.1"
         android:text="______ hello"

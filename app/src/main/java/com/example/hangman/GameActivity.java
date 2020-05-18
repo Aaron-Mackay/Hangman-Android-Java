@@ -36,11 +36,13 @@ public class GameActivity extends AppCompatActivity {
     String[] guessedLetters;
     TextView guessedLettersDisplay;
     TextView goalStringDisplay;
+    TextView currentScoreDisplay;
     Button guessButton;
     Button restartButton;
     GoalString goalString;
     int points = 0;
     ListObject goalStringList;
+    ScoreKeeper scoreKeeper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class GameActivity extends AppCompatActivity {
         mainImage = findViewById(R.id.mainImage);
         guessedLettersDisplay = findViewById(R.id.guessedLetters);
         goalStringDisplay = findViewById(R.id.goalStringDisplay);
+        currentScoreDisplay = findViewById(R.id.currentScoreView);
         guessButton = findViewById(R.id.guessButton);
         restartButton = findViewById(R.id.restartButton);
         for (int i = 1; i <= 11; i++) {
@@ -56,6 +59,8 @@ public class GameActivity extends AppCompatActivity {
             int imageId = getResources().getIdentifier(imageName, "drawable", getApplicationInfo().packageName);
             imageMap.put(imageName, imageId);
         }
+        // Get scorekeeper
+        scoreKeeper = getIntent().getParcelableExtra("scoreKeeper");
 
         //Hardcoded list selection for now todo list selector
         String chosenList = getIntent().getStringExtra("listName");
@@ -130,7 +135,11 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void winRound() {
-        points++;
+        scoreKeeper.increaseScore(1); //todo add more points for guesses
+        scoreKeeper.updateHighScore();
+        scoreKeeper.getCurrentScore();
+        currentScoreDisplay.setText(Integer.toString(scoreKeeper.getCurrentScore()));
+
         mainImage.setImageResource(R.drawable.win);
         guessButton.setVisibility(View.INVISIBLE);
         restartButton.setText("Continue");
@@ -138,13 +147,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void gameOver() {
+        scoreKeeper.updateHighScore();
+        scoreKeeper.setCurrentScore(0);
+        currentScoreDisplay.setText(Integer.toString(scoreKeeper.getCurrentScore()));
+
         goalStringDisplay.setText(goalString.getOpenString());
         mainImage.setImageResource(R.drawable.gameover);
         guessButton.setVisibility(View.INVISIBLE);
         restartButton.setText("Restart");
         restartButton.setVisibility(View.VISIBLE);
-        //todo change step button to restart
-        //todo hide scroller
     }
 
     public void updatePicker(String[] guessedLetters) {

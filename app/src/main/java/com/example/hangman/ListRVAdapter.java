@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ListRVAdapter extends RecyclerView.Adapter<ListRVAdapter.ViewHolder> {
+    ScoreKeeper scoreKeeper = new ScoreKeeper("anonymous", null); //todo add button%method for login, update "user"
+
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -83,8 +85,11 @@ public class ListRVAdapter extends RecyclerView.Adapter<ListRVAdapter.ViewHolder
             @Override
             public void onClick(View v) {
                 String selectedList = mGoalStringNameList.get(position);
+                scoreKeeper.setList(selectedList);
+
                 Intent myIntent = new Intent(mContext, GameActivity.class);
                 myIntent.putExtra("listName", selectedList);
+                myIntent.putExtra("scoreKeeper", scoreKeeper);
                 mContext.startActivity(myIntent);
             }
         };
