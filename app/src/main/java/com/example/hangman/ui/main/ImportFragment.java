@@ -9,10 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.example.hangman.APIFetch;
 import com.example.hangman.R;
 
 import org.json.JSONException;
@@ -54,27 +56,30 @@ public class ImportFragment extends Fragment implements View.OnClickListener {
                 handler = new Handler();
                 new Thread() {
                     public void run() {
-                        apiFetch(listName);
+                        try {
+                            APIFetch.apiFetch(listName, getContext());
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getContext(),
+                                            String.format("%s downloaded", listName),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getContext(),
+                                            String.format("Failed to download %s", listName),
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
                         ;
                     }
                 }.start();
         }
     }
 
-    public void apiFetch(String listName) {
-        try {
-            //todo build function for testing on home wifi
-            String APIURL = "http://185.108.171.164:2500/api/%s.json";
-            URL url = new URL(String.format(APIURL, listName.toLowerCase()));
 
-            InputStream inputStream = url.openStream();
-            Path check = Paths.get(String.valueOf(getActivity().getFilesDir()) + String.format("/%s.json", listName));
-            Log.d("inthread", String.valueOf(check));
-            Files.copy(inputStream, check, StandardCopyOption.REPLACE_EXISTING);
-            //todo add toast message for success/fail
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 }

@@ -16,7 +16,7 @@ import com.example.hangman.R;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private static final String[] TAB_TITLES = new String[]{"Local", "Import"}; //add "Online" for extra section
+    private static final String[] TAB_TITLES = new String[]{"Local", "Import", "Online"}; //add "Online" for extra section
     private final Context mContext;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
@@ -32,9 +32,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 LocalFragment home = new LocalFragment();
                 return home;
-            /*case 1:
+            case 2:
                 OnlineFragment about = new OnlineFragment();
-                return about;*/
+                return about;
             case 1:
                 ImportFragment contact = new ImportFragment();
                 return contact;

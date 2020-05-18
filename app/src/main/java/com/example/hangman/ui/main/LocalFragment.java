@@ -1,5 +1,6 @@
 package com.example.hangman.ui.main;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,12 +12,15 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.hangman.ListRVAdapter;
+import com.example.hangman.ListSelectActivity;
 import com.example.hangman.R;
 
 import java.io.File;
@@ -34,6 +38,7 @@ public class LocalFragment extends Fragment {
     List<String> filenames = new ArrayList<>();
     ListRVAdapter adapter;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         View RootView = inflater.inflate(R.layout.fragment_local, viewGroup, false);
@@ -48,7 +53,6 @@ public class LocalFragment extends Fragment {
         recyclerViewLocal.setAdapter(adapter);
         // Set layout manager to position the items
         recyclerViewLocal.setLayoutManager(new LinearLayoutManager(getActivity()));
-
 
         return RootView;
     }
