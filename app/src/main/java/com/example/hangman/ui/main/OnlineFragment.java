@@ -8,27 +8,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.hangman.APIFetch;
+import com.example.hangman.APIUsage;
 import com.example.hangman.OnlineListRVAdapter;
 import com.example.hangman.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,7 +65,7 @@ public class OnlineFragment extends Fragment {
             public void run() {
                 List<String> threadTemp = new ArrayList<>();
                 try {
-                    threadTemp = APIFetch.apiListsFetch();
+                    threadTemp = APIUsage.apiListsFetch();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

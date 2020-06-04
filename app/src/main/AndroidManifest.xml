@@ -14,8 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ListSelectActivity"
-            android:label="@string/title_activity_list_select"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_list_select"></activity>
         <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

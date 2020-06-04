@@ -1,7 +1,6 @@
 package com.example.hangman;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.hangman.ui.main.OnlineFragment;
 
 import java.io.IOException;
 import java.util.List;
@@ -94,7 +91,7 @@ public class OnlineListRVAdapter extends RecyclerView.Adapter<OnlineListRVAdapte
                 new Thread() {
                     public void run() {
                         try {
-                            APIFetch.apiFetch(selectedList, mContext);
+                            APIUsage.apiFetch(selectedList, mContext);
                             handler.post(new Runnable() {
                                 public void run() {
                                     mGoalStringNameList.remove(position);

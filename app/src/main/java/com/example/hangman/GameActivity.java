@@ -1,17 +1,24 @@
 package com.example.hangman;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.opencsv.CSVReader;
+
+import org.json.JSONArray;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,11 +50,26 @@ public class GameActivity extends AppCompatActivity {
     int points = 0;
     ListObject goalStringList;
     ScoreKeeper scoreKeeper;
+    SharedPreferences sharedPref;
+    Button mButton;
+    Handler fetchHandler;
+    Gson gson = new Gson();
+    List<ScoreboardRow> objList;
+    List<ScoreboardRow> combinedDBandServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPref = getSharedPreferences("MyPref", 0);
+
+        this.getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        this.getSupportActionBar().setCustomView(R.layout.customactionbar);
+        mButton = (Button) findViewById(R.id.loginButton);
+        mButton.setText(sharedPref.getString("username", "login"));
+
+
         mainImage = findViewById(R.id.mainImage);
         guessedLettersDisplay = findViewById(R.id.guessedLetters);
         goalStringDisplay = findViewById(R.id.goalStringDisplay);
@@ -61,6 +83,7 @@ public class GameActivity extends AppCompatActivity {
         }
         // Get scorekeeper
         scoreKeeper = getIntent().getParcelableExtra("scoreKeeper");
+        scoreKeeper.setUser(sharedPref.getString("username", "anonymous"));
 
         //Hardcoded list selection for now todo list selector
         String chosenList = getIntent().getStringExtra("listName");
@@ -136,18 +159,59 @@ public class GameActivity extends AppCompatActivity {
 
     private void winRound() {
         scoreKeeper.increaseScore(1); //todo add more points for guesses
-        scoreKeeper.updateHighScore();
+        scoreKeeper.updateHighScore(getApplicationContext());
         scoreKeeper.getCurrentScore();
+
+
         currentScoreDisplay.setText(Integer.toString(scoreKeeper.getCurrentScore()));
 
         mainImage.setImageResource(R.drawable.win);
         guessButton.setVisibility(View.INVISIBLE);
         restartButton.setText("Continue");
         restartButton.setVisibility(View.VISIBLE);
+
+        fetchHandler = new Handler();
+        new Thread() {
+            public void run() {
+                JSONArray threadTemp = new JSONArray();
+                objList = new ArrayList<>();
+
+                try {
+                    /*threadTemp = APIUsage.apiScoreboardFetch();
+                    for (int i = 0; i < threadTemp.length(); i++) {
+                        ScoreboardRow scoreboardRow = gson.fromJson(String.valueOf(threadTemp.getJSONObject(i)), ScoreboardRow.class);
+                        scoreboardRow.setDatetime(); // converts unix timestamp to more human readable
+                        objList.add(scoreboardRow);
+                        String datetime = scoreboardRow.getDatetime();
+                    }*/
+
+                    // with the latest copy of the online db, store in local db
+                    AppDatabase database = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "mydb")
+                            .fallbackToDestructiveMigration()
+                            .build();
+                    database.scoreboardDao().insertMultiple(objList);
+
+                    combinedDBandServer = database.scoreboardDao().getAllRowsDB();
+                    for (ScoreboardRow scoreboardRow : combinedDBandServer) {
+                        APIUsage.apiSendScores(scoreboardRow);
+                    }
+                    Log.d("db", "successfully stored");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    fetchHandler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    String.format("Failed to fetch latest scoreboard"),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }.start();
     }
 
     private void gameOver() {
-        scoreKeeper.updateHighScore();
+        scoreKeeper.updateHighScore(getApplicationContext());
         scoreKeeper.setCurrentScore(0);
         currentScoreDisplay.setText(Integer.toString(scoreKeeper.getCurrentScore()));
 
@@ -220,5 +284,9 @@ public class GameActivity extends AppCompatActivity {
 
     public void restartGame(View view) {
         initialiseGame(goalStringList);
+    }
+
+    public void login(View view) {
+        ScoreKeeper.login(view, this, sharedPref);
     }
 }
