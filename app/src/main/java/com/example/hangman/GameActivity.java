@@ -38,6 +38,7 @@ public class GameActivity extends AppCompatActivity {
     ImageView mainImage;
     int stage = 1;
     final int guessesAllowed = 11;
+    float percentGuessed;
     NumberPicker letterPicker;
     String[] pickerLetters;
     String[] guessedLetters;
@@ -104,6 +105,8 @@ public class GameActivity extends AppCompatActivity {
         guessedLetters = new String[26];
         updateGuessedDisplay(guessedLetters);
         updatePicker(guessedLetters);
+
+        percentGuessed = 0;
     }
 
     private GoalString selectFromList(ArrayList<String> gameStrings) {
@@ -279,6 +282,8 @@ public class GameActivity extends AppCompatActivity {
         }
         goalString.setClosedString(goalStringCurrent); //updates with revealed string
         goalStringDisplay.setText(goalStringCurrent);
+
+        percentGuessed = goalString.getPercentage(goalString);
         return match;
     }
 

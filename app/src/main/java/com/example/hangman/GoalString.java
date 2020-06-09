@@ -31,4 +31,17 @@ class GoalString {
     public void setClosedString(String closedString) {
         this.closedString = closedString;
     }
+
+    public float getPercentage(GoalString goalString) {
+        String closedString = goalString.getClosedString();
+        float stringLength = closedString.length();
+        float guessedLength = 0;
+        for (int i = 0; i < stringLength; i++) {
+            if (closedString.charAt(i) != '_') {
+                guessedLength++;
+            }
+        }
+        float percentGuessed = guessedLength / stringLength;
+        return percentGuessed;
+    }
 }
