@@ -1,16 +1,21 @@
 package com.example.hangman;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +52,7 @@ public class GameActivity extends AppCompatActivity {
     TextView currentScoreDisplay;
     Button guessButton;
     Button restartButton;
+    Button attemptButton;
     GoalString goalString;
     int points = 0;
     ListObject goalStringList;
@@ -77,6 +83,7 @@ public class GameActivity extends AppCompatActivity {
         currentScoreDisplay = findViewById(R.id.currentScoreView);
         guessButton = findViewById(R.id.guessButton);
         restartButton = findViewById(R.id.restartButton);
+        attemptButton = findViewById(R.id.attemptButton);
         for (int i = 1; i <= 11; i++) {
             String imageName = String.format("stage%d", i);
             int imageId = getResources().getIdentifier(imageName, "drawable", getApplicationInfo().packageName);
@@ -98,7 +105,8 @@ public class GameActivity extends AppCompatActivity {
         mainImage.setImageResource(imageMap.get(String.format("stage%d", stage)));
 
         guessButton.setVisibility(View.VISIBLE);
-        restartButton.setVisibility(View.GONE);
+        restartButton.setVisibility(View.INVISIBLE);
+        attemptButton.setEnabled(true);
         ArrayList<String> gameStrings = new ArrayList<>(Arrays.asList(goalStringList.list));
         goalString = selectFromList(gameStrings);
         pickerLetters = new String[]{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
@@ -139,7 +147,7 @@ public class GameActivity extends AppCompatActivity {
         String selectedLetter = pickerLetters[letterPicker.getValue()];
         boolean guessMatch = checkGuess(selectedLetter, goalString);
         if (guessMatch && goalString.getClosedString().equalsIgnoreCase(goalString.getOpenString())) {
-            winRound();
+            winRound(1);
         } else if (!guessMatch) {
             stage++;
             if (stage <= guessesAllowed) {
@@ -160,8 +168,8 @@ public class GameActivity extends AppCompatActivity {
         updatePicker(guessedLetters);
     }
 
-    private void winRound() {
-        scoreKeeper.increaseScore(1); //todo add more points for guesses
+    private void winRound(int pointsWon) {
+        scoreKeeper.increaseScore(pointsWon); //todo add more points for guesses
         scoreKeeper.updateHighScore(getApplicationContext());
         scoreKeeper.getCurrentScore();
 
@@ -172,6 +180,7 @@ public class GameActivity extends AppCompatActivity {
         guessButton.setVisibility(View.INVISIBLE);
         restartButton.setText("Continue");
         restartButton.setVisibility(View.VISIBLE);
+        attemptButton.setEnabled(false);
 
         fetchHandler = new Handler();
         new Thread() {
@@ -223,6 +232,7 @@ public class GameActivity extends AppCompatActivity {
         guessButton.setVisibility(View.INVISIBLE);
         restartButton.setText("Restart");
         restartButton.setVisibility(View.VISIBLE);
+        attemptButton.setEnabled(false);
     }
 
     public void updatePicker(String[] guessedLetters) {
@@ -293,5 +303,44 @@ public class GameActivity extends AppCompatActivity {
 
     public void login(View view) {
         ScoreKeeper.login(view, this, sharedPref);
+    }
+
+    public void attemptGuess(View view) {
+        final int pointsToGain;
+        if (percentGuessed < 0.33) {
+            pointsToGain = 3;
+        } else if (percentGuessed < 0.66) {
+            pointsToGain = 2;
+        } else {
+            pointsToGain = 1;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Full Guess");
+        if (pointsToGain == 0) {
+            builder.setMessage("Get the full phrase for 1 point");
+        } else {
+            builder.setMessage(String.format("Get the full phrase for %d points", pointsToGain));
+        }
+
+
+        final EditText guessAttempt = new EditText(this);
+        guessAttempt.setInputType(InputType.TYPE_CLASS_TEXT);
+        guessAttempt.setHint("Phrase");
+        builder.setView(guessAttempt);
+
+        builder.setPositiveButton("Guess", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String answerLower = goalString.getOpenString().toLowerCase();
+                String guessLower = guessAttempt.getText().toString().toLowerCase();
+                if (answerLower.equals(guessLower)) {
+                    winRound(pointsToGain);
+                } else {
+                    gameOver();
+                }
+            }
+        });
+        builder.show();
     }
 }
