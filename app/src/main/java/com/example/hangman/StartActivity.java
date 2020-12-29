@@ -103,7 +103,9 @@ public class StartActivity extends AppCompatActivity {
         //todo add popup with instructions, currently using for testing
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("Instructions");
-        alertDialogBuilder.setMessage("Welcome to Hangman! Choose a list from the defaults, or download one from online. Guess the letters of the phrases given, and climb the leaderboard of that list!\n\nGo to playhangman.co.uk to upload your own, and learn about the project.");
+        alertDialogBuilder.setMessage("Welcome to Hangman! Guess letter by letter for 1 point, or guess the whole phrase and get more points the less letters you revealed - though be careful, get it wrong and its game over! Choose a list from the defaults, or download one from online. Get as many points as you can, and climb the leaderboard of that list!\n" +
+                "\n" +
+                "Go to playhangman.co.uk to upload your own, and learn about the project.");
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();

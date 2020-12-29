@@ -41,7 +41,7 @@ public class APIUsage {
     public static List<String> apiListsFetch() throws JSONException, IOException {
 
         //todo build function for testing on home wifi
-        String APIURL = "http://185.108.171.164:2500/api";
+        String APIURL = "http://185.108.171.44:2500/api";
         URL url = new URL(APIURL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.connect();
